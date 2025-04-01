@@ -4,8 +4,8 @@
   "name": "Tesa Cloud - API Documentation",
   "colors": {
     "primary": "#19bdc6",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "light": "#19bdc6",
+    "dark": "#148b92"
   },
   "favicon": "/favicon.svg",
   "navigation": {
