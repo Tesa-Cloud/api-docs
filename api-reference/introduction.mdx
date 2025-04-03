@@ -1,23 +1,44 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Discover the Tesa Cloud API'
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  In order to use the Tesa Cloud API, you must register for a developer account. [Apply here](https://tesacloud.com/developer_signup).
 </Note>
 
 ## Welcome
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+Tesa Cloud APIs allow you to integrate your Tesa digital platform account with other software applications.
+
+We place emphasis on security and privacy considerations of regulatory compliance of your region of operations.
+
+APIs are built using REST conventions using standard HTTP methods and error response codes. All responses return standard JSON.
+
+Our endpoint guides provide developers interactive samples and sample code to help you create your solutions. 
 
 <Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+  title="Patient Information Endpoints"
+  icon="user"
+  href="api-reference/patients"
 >
-  View the OpenAPI specification file
+  Create, edit and query patient personal and contact information.
+</Card>
+
+<Card
+  title="Appointments & Procedures Endpoints"
+  icon="add"
+  href="api-reference/appointments"
+>
+  Query appointment details, surgical procedure details
+</Card>
+
+<Card
+  title="Patient Survey Endpoints"
+  icon="Check"
+  href="api-reference/surveys"
+>
+  Query patient reported outcome submissions
 </Card>
 
 ## Authentication
