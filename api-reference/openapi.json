@@ -12,13 +12,18 @@
   ],
   "security": [
     {
-      "bearerAuth": []
+      "TesaAuth": []
     }
   ],
   "paths": {
     "/createPatientProfile": {
       "post": {
         "description": "Creates a new patient profile",
+        "security": [
+          {
+            "TesaAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -138,9 +143,16 @@
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "TesaAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "Use your organization-scoped API key and secret. Provide the `x-api-key` and `x-api-secret` headers in every request."
+      },
+      "TesaSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-secret"
       }
     }
   }
