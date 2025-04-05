@@ -12,18 +12,14 @@
   ],
   "security": [
     {
-      "TesaAuth": []
+      "ApiKeyHeader": [],
+      "ApiSecretHeader": []
     }
   ],
   "paths": {
     "/createPatientProfile": {
       "post": {
         "description": "Creates a new patient profile",
-        "security": [
-          {
-            "TesaAuth": []
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -64,6 +60,58 @@
           }
         }
       }
+    },
+    "/fetchMyPatients": {
+      "post": {
+        "description": "Fetches a paginated list of patients associated with the authenticated organization's API key.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of patients to return.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of patients to skip from the beginning of the result set.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of patients",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -73,25 +121,21 @@
         "properties": {
           "first_name_initial": {
             "type": "string",
-            "maxLength": 1,
-            "description": "The first initial of the patient's first name"
+            "maxLength": 1
           },
           "last_name": {
-            "type": "string",
-            "description": "The patient's last name"
+            "type": "string"
           },
           "year_of_birth": {
             "type": "string",
-            "pattern": "^(19|20)\\d{2}$",
-            "description": "Four-digit year of birth (must be <= current year and not older than 120 years)"
+            "pattern": "^(19|20)\\d{2}$"
           },
           "gender": {
             "type": "string",
             "enum": ["Male", "Female", "Other"]
           },
           "ehr_id": {
-            "type": "string",
-            "description": "The patient's EHR ID"
+            "type": "string"
           },
           "ethnicity": {
             "type": "string",
@@ -106,8 +150,7 @@
             "format": "email"
           },
           "mobile_phone": {
-            "type": "string",
-            "description": "Mobile phone number"
+            "type": "string"
           },
           "preferred_contact_method": {
             "type": "string",
@@ -131,28 +174,89 @@
           "preferred_language"
         ]
       },
+      "Patient": {
+        "type": "object",
+        "properties": {
+          "person_id": {
+            "type": "integer"
+          },
+          "patient_id": {
+            "type": "integer"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "year_of_birth": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": ["Male", "Female", "Other"]
+          },
+          "ethnicity": {
+            "type": "string"
+          },
+          "ehr_id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "person_id",
+          "patient_id",
+          "first_name",
+          "surname",
+          "year_of_birth",
+          "gender",
+          "ethnicity",
+          "ehr_id",
+          "email"
+        ]
+      },
+      "PatientListResponse": {
+        "type": "object",
+        "properties": {
+          "total_count": {
+            "type": "integer",
+            "description": "Total number of patients in the system for this organization."
+          },
+          "patients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Patient"
+            }
+          }
+        },
+        "required": ["total_count", "patients"]
+      },
       "Error": {
         "type": "object",
         "required": ["error"],
         "properties": {
           "error": {
-            "type": "string",
-            "description": "Description of the error"
+            "type": "string"
           }
         }
       }
     },
     "securitySchemes": {
-      "TesaAuth": {
+      "ApiKeyHeader": {
         "type": "apiKey",
         "in": "header",
         "name": "x-api-key",
-        "description": "Use your organization-scoped API key and secret. Provide the `x-api-key` and `x-api-secret` headers in every request."
+        "description": "Your Tesa Cloud API Key (organization-scoped)."
       },
-      "TesaSecret": {
+      "ApiSecretHeader": {
         "type": "apiKey",
         "in": "header",
-        "name": "x-api-secret"
+        "name": "x-api-secret",
+        "description": "Your secret API token. Keep this secure and never expose it in client apps."
       }
     }
   }
