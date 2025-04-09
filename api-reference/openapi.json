@@ -127,7 +127,7 @@
             "type": "string"
           },
           "year_of_birth": {
-            "type": "string",
+            "type": "integer",
             "pattern": "^(19|20)\\d{2}$"
           },
           "gender": {
@@ -177,46 +177,53 @@
       "Patient": {
         "type": "object",
         "properties": {
-          "person_id": {
-            "type": "integer"
-          },
-          "patient_id": {
-            "type": "integer"
-          },
-          "first_name": {
-            "type": "string"
-          },
-          "surname": {
-            "type": "string"
-          },
-          "year_of_birth": {
-            "type": "string"
-          },
+          "person_id": { "type": "integer" },
+          "patient_id": { "type": "integer" },
+          "first_name": { "type": "string" },
+          "last_name": { "type": "string" },
+          "year_of_birth": { "type": "integer" },
           "gender": {
             "type": "string",
             "enum": ["Male", "Female", "Other"]
           },
-          "ethnicity": {
-            "type": "string"
+          "ethnicity": { "type": "string" },
+          "EHR_patient_id": { "type": "string" },
+          "appointment_time": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "The date/time of the patient's most recent appointment."
           },
-          "ehr_id": {
-            "type": "string"
+          "procedure_title": {
+            "type": ["string", "null"],
+            "description": "The surgical procedure performed at the most recent appointment."
           },
           "email": {
-            "type": "string",
+            "type": ["string", "null"],
             "format": "email"
+          },
+          "sms_number": {
+            "type": ["string", "null"]
+          },
+          "organisation_id": { "type": "integer" },
+          "preferred_language": {
+            "type": ["string", "null"],
+            "enum": ["en", "es", "fr", "pt", "ar", "zh", "hi"]
+          },
+          "row_id": {
+            "type": "integer",
+            "description": "Server-generated row ID for pagination purposes."
           }
         },
         "required": [
           "person_id",
           "patient_id",
           "first_name",
-          "surname",
+          "last_name",
           "year_of_birth",
           "gender",
           "ethnicity",
-          "ehr_id",
-          "email"
+          "EHR_patient_id",
+          "organisation_id"
         ]
       },
       "PatientListResponse": {
@@ -224,7 +231,7 @@
         "properties": {
           "total_count": {
             "type": "integer",
-            "description": "Total number of patients in the system for this organization."
+            "description": "Total number of patients available for pagination."
           },
           "patients": {
             "type": "array",
