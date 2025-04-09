@@ -29,13 +29,10 @@
           {
             "group": "API Documentation",
             "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint Examples",
-            "pages": [
-              "api-reference/endpoint/post-createpatientprofile"
+              "api-reference/introduction",
+              "api-reference/patients",
+              "api-reference/appointments",
+              "api-reference/surveys"
             ]
           }
         ]

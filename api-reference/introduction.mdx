@@ -43,12 +43,13 @@ Our endpoint guides provide developers interactive samples and sample code to he
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API endpoints are authenticated using organization-specific API key and SECRET which you can generate in your Tesa Cloud app under SETTINGS.
 
 ```json
-"security": [
+"headers": [
   {
-    "bearerAuth": []
+    "x-api-key": [],
+    "x-api-secret": []
   }
 ]
 ```
