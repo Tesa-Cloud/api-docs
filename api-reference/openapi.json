@@ -39,8 +39,7 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "integer",
-                      "description": "Unique ID of the created patient"
+                      "type": "integer"
                     }
                   },
                   "required": ["id"]
@@ -68,30 +67,23 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Maximum number of patients to return.",
-            "required": false,
             "schema": {
               "type": "integer",
-              "default": 50,
-              "minimum": 1,
-              "maximum": 100
+              "default": 50
             }
           },
           {
             "name": "offset",
             "in": "query",
-            "description": "Number of patients to skip from the beginning of the result set.",
-            "required": false,
             "schema": {
               "type": "integer",
-              "default": 0,
-              "minimum": 0
+              "default": 0
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Paginated list of patients",
+            "description": "List of patients",
             "content": {
               "application/json": {
                 "schema": {
@@ -112,6 +104,56 @@
           }
         }
       }
+    },
+    "/fetchPatientProfile": {
+      "post": {
+        "description": "Fetches the profile of a single patient by their Tesa Cloud patient ID.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "patient_id": {
+                    "type": "integer",
+                    "description": "The internal Tesa Cloud patient ID."
+                  }
+                },
+                "required": ["patient_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Patient profile successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unauthorized access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -119,24 +161,11 @@
       "NewPatientProfile": {
         "type": "object",
         "properties": {
-          "first_name_initial": {
-            "type": "string",
-            "maxLength": 1
-          },
-          "last_name": {
-            "type": "string"
-          },
-          "year_of_birth": {
-            "type": "integer",
-            "pattern": "^(19|20)\\d{2}$"
-          },
-          "gender": {
-            "type": "string",
-            "enum": ["Male", "Female", "Other"]
-          },
-          "ehr_id": {
-            "type": "string"
-          },
+          "first_name_initial": { "type": "string", "maxLength": 1 },
+          "last_name": { "type": "string" },
+          "year_of_birth": { "type": "string", "pattern": "^(19|20)\\d{2}$" },
+          "gender": { "type": "string", "enum": ["Male", "Female", "Other"] },
+          "ehr_id": { "type": "string" },
           "ethnicity": {
             "type": "string",
             "enum": [
@@ -145,17 +174,9 @@
               "South Asian", "Mixed/Other"
             ]
           },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "mobile_phone": {
-            "type": "string"
-          },
-          "preferred_contact_method": {
-            "type": "string",
-            "enum": ["email", "sms"]
-          },
+          "email": { "type": "string", "format": "email" },
+          "mobile_phone": { "type": "string" },
+          "preferred_contact_method": { "type": "string", "enum": ["email", "sms"] },
           "preferred_language": {
             "type": "string",
             "enum": ["en", "es", "fr", "pt", "ar", "zh", "hi"]
@@ -180,75 +201,57 @@
           "person_id": { "type": "integer" },
           "patient_id": { "type": "integer" },
           "first_name": { "type": "string" },
-          "last_name": { "type": "string" },
-          "year_of_birth": { "type": "integer" },
-          "gender": {
-            "type": "string",
-            "enum": ["Male", "Female", "Other"]
-          },
+          "surname": { "type": "string" },
+          "year_of_birth": { "type": "string" },
+          "gender": { "type": "string" },
           "ethnicity": { "type": "string" },
-          "EHR_patient_id": { "type": "string" },
-          "appointment_time": {
-            "type": ["string", "null"],
-            "format": "date-time",
-            "description": "The date/time of the patient's most recent appointment."
-          },
-          "procedure_title": {
-            "type": ["string", "null"],
-            "description": "The surgical procedure performed at the most recent appointment."
-          },
-          "email": {
-            "type": ["string", "null"],
-            "format": "email"
-          },
-          "sms_number": {
-            "type": ["string", "null"]
-          },
-          "organisation_id": { "type": "integer" },
-          "preferred_language": {
-            "type": ["string", "null"],
-            "enum": ["en", "es", "fr", "pt", "ar", "zh", "hi"]
-          },
-          "row_id": {
-            "type": "integer",
-            "description": "Server-generated row ID for pagination purposes."
-          }
+          "ehr_id": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
         },
         "required": [
-          "person_id",
-          "patient_id",
-          "first_name",
-          "last_name",
-          "year_of_birth",
-          "gender",
-          "ethnicity",
-          "EHR_patient_id",
-          "organisation_id"
+          "person_id", "patient_id", "first_name", "surname", "year_of_birth",
+          "gender", "ethnicity", "ehr_id", "email"
         ]
       },
       "PatientListResponse": {
         "type": "object",
         "properties": {
-          "total_count": {
-            "type": "integer",
-            "description": "Total number of patients available for pagination."
-          },
+          "total_count": { "type": "integer" },
           "patients": {
             "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Patient"
-            }
+            "items": { "$ref": "#/components/schemas/Patient" }
           }
         },
         "required": ["total_count", "patients"]
+      },
+      "PatientProfile": {
+        "type": "object",
+        "properties": {
+          "patient_id": { "type": "integer" },
+          "person_id": { "type": "integer" },
+          "ehr_id": { "type": "string" },
+          "first_name_initial": { "type": "string" },
+          "last_name": { "type": "string" },
+          "year_of_birth": { "type": "integer" },
+          "gender": { "type": "string", "enum": ["Male", "Female", "Other"] },
+          "ethnicity": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "mobile_phone": { "type": "string" },
+          "preferred_language": {
+            "type": "string",
+            "enum": ["en", "es", "fr", "pt", "ar", "zh", "hi"]
+          }
+        },
+        "required": [
+          "patient_id", "person_id", "ehr_id", "first_name_initial", "last_name",
+          "year_of_birth", "gender", "ethnicity", "email", "mobile_phone", "preferred_language"
+        ]
       },
       "Error": {
         "type": "object",
         "required": ["error"],
         "properties": {
-          "error": {
-            "type": "string"
-          }
+          "error": { "type": "string" }
         }
       }
     },
