@@ -17,7 +17,7 @@
     }
   ],
   "paths": {
-    "/createPatientProfile": {
+    "/createpatientprofile": {
       "post": {
         "description": "Creates a new patient profile",
         "requestBody": {
@@ -60,7 +60,7 @@
         }
       }
     },
-    "/fetchMyPatients": {
+    "/fetchmypatients": {
       "post": {
         "description": "Fetches a paginated list of patients associated with the authenticated organization's API key.",
         "parameters": [
@@ -105,7 +105,7 @@
         }
       }
     },
-    "/fetchPatientProfile": {
+    "/fetchpatientprofile": {
       "post": {
         "description": "Fetches the profile of a single patient by their Tesa Cloud patient ID.",
         "security": [
