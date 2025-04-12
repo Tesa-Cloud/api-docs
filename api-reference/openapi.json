@@ -20,6 +20,12 @@
     "/createpatientprofile": {
       "post": {
         "description": "Creates a new patient profile",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -42,13 +48,25 @@
                       "type": "integer"
                     }
                   },
-                  "required": ["id"]
+                  "required": [
+                    "id"
+                  ]
                 }
               }
             }
           },
           "400": {
             "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
             "content": {
               "application/json": {
                 "schema": {
@@ -63,6 +81,12 @@
     "/fetchmypatients": {
       "post": {
         "description": "Fetches a paginated list of patients associated with the authenticated organization's API key.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
         "parameters": [
           {
             "name": "limit",
@@ -93,7 +117,17 @@
             }
           },
           "400": {
-            "description": "Invalid request or unauthorized access",
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
             "content": {
               "application/json": {
                 "schema": {
@@ -122,11 +156,12 @@
                 "type": "object",
                 "properties": {
                   "patient_id": {
-                    "type": "integer",
-                    "description": "The internal Tesa Cloud patient ID."
+                    "type": "integer"
                   }
                 },
-                "required": ["patient_id"]
+                "required": [
+                  "patient_id"
+                ]
               }
             }
           }
@@ -143,7 +178,63 @@
             }
           },
           "400": {
-            "description": "Invalid request or unauthorized access.",
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fetchlocations": {
+      "post": {
+        "description": "Fetches a list of locations associated with the authenticated organization's API key.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of locations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Location"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
             "content": {
               "application/json": {
                 "schema": {
@@ -161,25 +252,68 @@
       "NewPatientProfile": {
         "type": "object",
         "properties": {
-          "first_name_initial": { "type": "string", "maxLength": 1 },
-          "last_name": { "type": "string" },
-          "year_of_birth": { "type": "string", "pattern": "^(19|20)\\d{2}$" },
-          "gender": { "type": "string", "enum": ["Male", "Female", "Other"] },
-          "ehr_id": { "type": "string" },
+          "first_name_initial": {
+            "type": "string",
+            "maxLength": 1
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "year_of_birth": {
+            "type": "string",
+            "pattern": "^(19|20)\\d{2}$"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "Male",
+              "Female",
+              "Other"
+            ]
+          },
+          "ehr_id": {
+            "type": "string"
+          },
           "ethnicity": {
             "type": "string",
             "enum": [
-              "African", "Asian", "East Asian", "European", "Hispanic/Latino",
-              "Middle Eastern", "Native/Indigenous", "Pacific Islander",
-              "South Asian", "Mixed/Other"
+              "African",
+              "Asian",
+              "East Asian",
+              "European",
+              "Hispanic/Latino",
+              "Middle Eastern",
+              "Native/Indigenous",
+              "Pacific Islander",
+              "South Asian",
+              "Mixed/Other"
             ]
           },
-          "email": { "type": "string", "format": "email" },
-          "mobile_phone": { "type": "string" },
-          "preferred_contact_method": { "type": "string", "enum": ["email", "sms"] },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "mobile_phone": {
+            "type": "string"
+          },
+          "preferred_contact_method": {
+            "type": "string",
+            "enum": [
+              "email",
+              "sms"
+            ]
+          },
           "preferred_language": {
             "type": "string",
-            "enum": ["en", "es", "fr", "pt", "ar", "zh", "hi"]
+            "enum": [
+              "en",
+              "es",
+              "fr",
+              "pt",
+              "ar",
+              "zh",
+              "hi"
+            ]
           }
         },
         "required": [
@@ -198,60 +332,173 @@
       "Patient": {
         "type": "object",
         "properties": {
-          "person_id": { "type": "integer" },
-          "patient_id": { "type": "integer" },
-          "first_name": { "type": "string" },
-          "surname": { "type": "string" },
-          "year_of_birth": { "type": "string" },
-          "gender": { "type": "string" },
-          "ethnicity": { "type": "string" },
-          "ehr_id": { "type": "string" },
-          "email": { "type": "string", "format": "email" }
+          "person_id": {
+            "type": "integer"
+          },
+          "patient_id": {
+            "type": "integer"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "year_of_birth": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "ethnicity": {
+            "type": "string"
+          },
+          "ehr_id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
         },
         "required": [
-          "person_id", "patient_id", "first_name", "surname", "year_of_birth",
-          "gender", "ethnicity", "ehr_id", "email"
+          "person_id",
+          "patient_id",
+          "first_name",
+          "surname",
+          "year_of_birth",
+          "gender",
+          "ethnicity",
+          "ehr_id",
+          "email"
         ]
       },
       "PatientListResponse": {
         "type": "object",
         "properties": {
-          "total_count": { "type": "integer" },
+          "total_count": {
+            "type": "integer"
+          },
           "patients": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/Patient" }
+            "items": {
+              "$ref": "#/components/schemas/Patient"
+            }
           }
         },
-        "required": ["total_count", "patients"]
+        "required": [
+          "total_count",
+          "patients"
+        ]
       },
       "PatientProfile": {
         "type": "object",
         "properties": {
-          "patient_id": { "type": "integer" },
-          "person_id": { "type": "integer" },
-          "ehr_id": { "type": "string" },
-          "first_name_initial": { "type": "string" },
-          "last_name": { "type": "string" },
-          "year_of_birth": { "type": "integer" },
-          "gender": { "type": "string", "enum": ["Male", "Female", "Other"] },
-          "ethnicity": { "type": "string" },
-          "email": { "type": "string", "format": "email" },
-          "mobile_phone": { "type": "string" },
-          "preferred_language": {
+          "patient_id": {
+            "type": "integer"
+          },
+          "person_id": {
+            "type": "integer"
+          },
+          "ehr_id": {
+            "type": "string"
+          },
+          "first_name_initial": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "year_of_birth": {
+            "type": "integer"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "ethnicity": {
+            "type": "string"
+          },
+          "email": {
             "type": "string",
-            "enum": ["en", "es", "fr", "pt", "ar", "zh", "hi"]
+            "format": "email"
+          },
+          "mobile_phone": {
+            "type": "string"
+          },
+          "preferred_language": {
+            "type": "string"
           }
         },
         "required": [
-          "patient_id", "person_id", "ehr_id", "first_name_initial", "last_name",
-          "year_of_birth", "gender", "ethnicity", "email", "mobile_phone", "preferred_language"
+          "patient_id",
+          "person_id",
+          "ehr_id",
+          "first_name_initial",
+          "last_name",
+          "year_of_birth",
+          "gender",
+          "ethnicity",
+          "email",
+          "mobile_phone",
+          "preferred_language"
+        ]
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "building_name": {
+            "type": "string"
+          },
+          "room_identifier": {
+            "type": "string"
+          },
+          "street_number": {
+            "type": "string"
+          },
+          "street_name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "building_name",
+          "room_identifier",
+          "street_number",
+          "street_name",
+          "city",
+          "state",
+          "postcode",
+          "country"
         ]
       },
       "Error": {
         "type": "object",
-        "required": ["error"],
+        "required": [
+          "error"
+        ],
         "properties": {
-          "error": { "type": "string" }
+          "error": {
+            "type": "string"
+          }
         }
       }
     },
@@ -259,14 +506,12 @@
       "ApiKeyHeader": {
         "type": "apiKey",
         "in": "header",
-        "name": "x-api-key",
-        "description": "Your Tesa Cloud API Key (organization-scoped)."
+        "name": "x-api-key"
       },
       "ApiSecretHeader": {
         "type": "apiKey",
         "in": "header",
-        "name": "x-api-secret",
-        "description": "Your secret API token. Keep this secure and never expose it in client apps."
+        "name": "x-api-secret"
       }
     }
   }
