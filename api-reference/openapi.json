@@ -245,6 +245,52 @@
           }
         }
       }
+    },
+    "/fetchproceduretemplates": {
+      "post": {
+        "description": "Fetches a list of surgical procedure templates associated with the authenticated organization's API key.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of procedure templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProcedureTemplate"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -253,41 +299,22 @@
         "type": "object",
         "properties": {
           "first_name_initial": {
-            "type": "string",
-            "maxLength": 1
+            "type": "string"
           },
           "last_name": {
             "type": "string"
           },
           "year_of_birth": {
-            "type": "string",
-            "pattern": "^(19|20)\\d{2}$"
+            "type": "string"
           },
           "gender": {
-            "type": "string",
-            "enum": [
-              "Male",
-              "Female",
-              "Other"
-            ]
+            "type": "string"
           },
           "ehr_id": {
             "type": "string"
           },
           "ethnicity": {
-            "type": "string",
-            "enum": [
-              "African",
-              "Asian",
-              "East Asian",
-              "European",
-              "Hispanic/Latino",
-              "Middle Eastern",
-              "Native/Indigenous",
-              "Pacific Islander",
-              "South Asian",
-              "Mixed/Other"
-            ]
+            "type": "string"
           },
           "email": {
             "type": "string",
@@ -297,23 +324,10 @@
             "type": "string"
           },
           "preferred_contact_method": {
-            "type": "string",
-            "enum": [
-              "email",
-              "sms"
-            ]
+            "type": "string"
           },
           "preferred_language": {
-            "type": "string",
-            "enum": [
-              "en",
-              "es",
-              "fr",
-              "pt",
-              "ar",
-              "zh",
-              "hi"
-            ]
+            "type": "string"
           }
         },
         "required": [
@@ -357,8 +371,7 @@
             "type": "string"
           },
           "email": {
-            "type": "string",
-            "format": "email"
+            "type": "string"
           }
         },
         "required": [
@@ -419,8 +432,7 @@
             "type": "string"
           },
           "email": {
-            "type": "string",
-            "format": "email"
+            "type": "string"
           },
           "mobile_phone": {
             "type": "string"
@@ -488,6 +500,49 @@
           "state",
           "postcode",
           "country"
+        ]
+      },
+      "ProcedureTemplate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "ligament": {
+            "type": "string"
+          },
+          "procedure_type": {
+            "type": "string"
+          },
+          "graft_type": {
+            "type": "string"
+          },
+          "graft_origin": {
+            "type": "string"
+          },
+          "femur_fixation": {
+            "type": "string"
+          },
+          "tibia_fixation": {
+            "type": "string"
+          },
+          "augment_type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "ligament",
+          "procedure_type",
+          "graft_type",
+          "graft_origin",
+          "femur_fixation",
+          "tibia_fixation",
+          "augment_type"
         ]
       },
       "Error": {
