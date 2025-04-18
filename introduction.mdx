@@ -14,58 +14,99 @@ description: "Welcome to Tesa Cloud API documentation"
   alt="Hero Dark"
 />
 
-## Setting up
+Tesa Cloud is a secure digital platform built to support connected surgical workflows. It powers surgical planning, procedure documentation, and post-operative reporting — all while ensuring regulatory compliance, data security, and developer extensibility.
 
-The first step to world-class documentation is setting up your editing environments.
+This API enables authorized applications to integrate with Tesa Cloud for managing patients, procedures, appointments, reports, and more. If you're building digital tools for healthcare professionals, device integrators, or reporting systems, you're in the right place.
 
-<CardGroup cols={2}>
-  <Card
-    title="Edit Your Docs"
-    icon="pen-to-square"
-    href="https://mintlify.com/docs/quickstart"
-  >
-    Get your docs set up locally for easy development
-  </Card>
-  <Card
-    title="Preview Changes"
-    icon="image"
-    href="https://mintlify.com/docs/development"
-  >
-    Preview your changes before you push to make sure they're perfect
-  </Card>
-</CardGroup>
+---
 
-## Make it yours
-
-Update your docs to your brand and add valuable content for the best user conversion.
+## What You Can Do
 
 <CardGroup cols={2}>
   <Card
-    title="Customize Style"
-    icon="palette"
-    href="https://mintlify.com/docs/settings/global"
+    title="Manage Patients & Appointments"
+    icon="calendar-days"
   >
-    Customize your docs to your company's colors and brands
+    Create, fetch, and manage patient records and their surgical appointments.
   </Card>
   <Card
-    title="Reference APIs"
-    icon="code"
-    href="https://mintlify.com/docs/api-playground/openapi"
+    title="Generate Post-Op Reports"
+    icon="file-medical"
   >
-    Automatically generate endpoints from an OpenAPI spec
-  </Card>
-  <Card
-    title="Add Components"
-    icon="screwdriver-wrench"
-    href="https://mintlify.com/docs/content/components/accordions"
-  >
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card
-    title="Get Inspiration"
-    icon="stars"
-    href="https://mintlify.com/customers"
-  >
-    Check out our showcase of our favorite documentation
+    Automate PDF reports with surgeon notes, images, and localized content.
   </Card>
 </CardGroup>
+
+<CardGroup cols={2}>
+  <Card
+    title="Customize System Preferences"
+    icon="sliders"
+  >
+    Set defaults like procedure templates, feedback surveys, and report layouts.
+  </Card>
+  <Card
+    title="Multi-language Support"
+    icon="language"
+  >
+    Serve global audiences with localized report generation and survey prompts.
+  </Card>
+</CardGroup>
+
+---
+
+## Authentication
+
+All API requests must be authenticated with an `x-api-key` and `x-api-secret` pair.
+
+To generate credentials:
+- Log in to your Tesa Cloud account
+- Navigate to **Settings → Developer Settings**
+- Create a new key pair (secrets are displayed only once)
+
+API access is protected by:
+- Supabase RLS (row-level security)
+- Cloudflare WAF and DDoS protection
+- Rate limiting and credential hashing at rest
+
+---
+
+## Getting Started
+
+Follow these steps to begin integrating with the Tesa Cloud platform:
+
+<CardGroup cols={2}>
+  <Card
+    title="Create API Credentials"
+    icon="key"
+    href="/authentication"
+  >
+    Generate your API key and secret securely from within the app.
+  </Card>
+  <Card
+    title="Explore the Reference"
+    icon="book"
+    href="/reference"
+  >
+    Review endpoint specs, sample payloads, and expected responses.
+  </Card>
+</CardGroup>
+
+---
+
+## Best Practices
+
+- Use **environment-specific keys** (e.g. staging vs production)
+- Secure your keys using a secrets manager (e.g. GCP Secret Manager)
+- Rotate your `x-api-secret` periodically
+- Follow a **least privilege principle** in how your app uses the API
+- Never expose secrets in frontend code
+
+---
+
+## Need help?
+
+If you're stuck:
+
+- Use the logs and error messages to troubleshoot malformed payloads
+- Reference our <a href="https://docs.tesacloud.com/api-reference/introduction" target="_self">endpoint definitions</a>
+- Contact our support team at <a href="mailto:help@tesacloud.com">help@tesacloud.com</a> 
