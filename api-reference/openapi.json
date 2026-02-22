@@ -291,6 +291,158 @@
           }
         }
       }
+    },
+    "/fetchappointments": {
+      "post": {
+        "description": "Fetches a paginated list of appointments within a date range for the authenticated organization.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchAppointmentsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of appointments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fetchorganisations": {
+      "post": {
+        "description": "Fetches organisation details for the authenticated organization's API key.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of organisations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Organisation"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/createappointment": {
+      "post": {
+        "description": "Creates a new appointment for a patient.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppointmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Appointment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -555,6 +707,250 @@
             "type": "string"
           }
         }
+      },
+      "FetchAppointmentsRequest": {
+        "type": "object",
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start date for the date range filter (ISO 8601 format)"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End date for the date range filter (ISO 8601 format)"
+          },
+          "page": {
+            "type": "integer",
+            "default": 1,
+            "description": "Page number for pagination"
+          },
+          "page_size": {
+            "type": "integer",
+            "default": 25,
+            "description": "Number of results per page"
+          }
+        },
+        "required": [
+          "start_date",
+          "end_date"
+        ]
+      },
+      "Appointment": {
+        "type": "object",
+        "properties": {
+          "appointment_id": {
+            "type": "integer",
+            "description": "Unique appointment identifier"
+          },
+          "datetime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Scheduled appointment date and time"
+          },
+          "location_description": {
+            "type": "string",
+            "description": "Description of the location"
+          },
+          "location_id": {
+            "type": "integer",
+            "description": "Location identifier"
+          },
+          "surgeon_name": {
+            "type": "string",
+            "description": "Full name of the surgeon"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in progress", "complete", "cancelled"],
+            "description": "Appointment status"
+          },
+          "procedure_description": {
+            "type": "string",
+            "description": "Description of the procedure(s)"
+          },
+          "organisation_name": {
+            "type": "string",
+            "description": "Name of the organisation"
+          },
+          "patient_first_name": {
+            "type": "string",
+            "description": "Patient's first name or initial"
+          },
+          "patient_surname": {
+            "type": "string",
+            "description": "Patient's surname"
+          },
+          "patient_ehr_id": {
+            "type": "string",
+            "description": "Patient's EHR ID"
+          },
+          "patient_id": {
+            "type": "integer",
+            "description": "Patient identifier"
+          }
+        }
+      },
+      "AppointmentListResponse": {
+        "type": "object",
+        "properties": {
+          "appointments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Appointment"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of appointments matching the filter"
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current page number"
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "Number of results per page"
+          }
+        },
+        "required": [
+          "appointments",
+          "total",
+          "page",
+          "page_size"
+        ]
+      },
+      "Organisation": {
+        "type": "object",
+        "properties": {
+          "org_id": {
+            "type": "integer",
+            "description": "Organisation identifier"
+          },
+          "business_name": {
+            "type": "string",
+            "description": "Business name of the organisation"
+          },
+          "opening_hours": {
+            "type": "string",
+            "description": "Opening hours description"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Contact email address"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Contact phone number"
+          }
+        },
+        "required": [
+          "org_id",
+          "business_name"
+        ]
+      },
+      "CreateAppointmentRequest": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "integer",
+            "description": "Patient identifier"
+          },
+          "location_id": {
+            "type": "integer",
+            "description": "Location identifier"
+          },
+          "organisation_id": {
+            "type": "integer",
+            "description": "Organisation identifier (optional, defaults to API key's organisation)"
+          },
+          "provider_id": {
+            "type": "integer",
+            "description": "Provider/surgeon identifier (optional)"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes for the appointment"
+          },
+          "procedure_template_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of procedure template IDs"
+          },
+          "scheduled_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Scheduled date and time (ISO 8601 format)"
+          }
+        },
+        "required": [
+          "patient_id",
+          "location_id",
+          "scheduled_date"
+        ]
+      },
+      "AppointmentResponse": {
+        "type": "object",
+        "properties": {
+          "appointment_id": {
+            "type": "integer",
+            "description": "Created appointment identifier"
+          },
+          "patient_id": {
+            "type": "integer",
+            "description": "Patient identifier"
+          },
+          "location_id": {
+            "type": "integer",
+            "description": "Location identifier"
+          },
+          "organisation_id": {
+            "type": "integer",
+            "description": "Organisation identifier"
+          },
+          "provider_id": {
+            "type": "integer",
+            "description": "Provider/surgeon identifier"
+          },
+          "procedure_template_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of procedure template IDs"
+          },
+          "scheduled_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Scheduled date and time"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Appointment notes"
+          },
+          "status": {
+            "type": "string",
+            "description": "Appointment status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the appointment was created"
+          }
+        },
+        "required": [
+          "appointment_id",
+          "patient_id",
+          "location_id",
+          "organisation_id",
+          "scheduled_date",
+          "status",
+          "created_at"
+        ]
       }
     },
     "securitySchemes": {

@@ -5,11 +5,17 @@ description: 'Create, edit and query appointment & procedure information'
 
 ## Endpoints
 
-- <span class="badge post">POST</span> <a href="endpoint/post-fetchlocations" target="_self">FetchLocations</a>  
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchappointments" target="_self">FetchAppointments</a>
+  Fetches a paginated list of appointments within a date range for the authenticated organization.
+
+- <span class="badge post">POST</span> <a href="endpoint/post-createappointment" target="_self">CreateAppointment</a>
+  Creates a new appointment for a patient with optional procedure templates.
+
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchlocations" target="_self">FetchLocations</a>
   Fetches a list of locations associated with the authenticated organization's API key.
 
-- <span class="badge post">POST</span> <a href="endpoint/post-fetchproceduretemplates" target="_self">FetchProcedureTemplates</a>  
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchproceduretemplates" target="_self">FetchProcedureTemplates</a>
   Fetches a list of surgical procedure templates associated with the authenticated organization's API key.
 
-
-
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchorganisations" target="_self">FetchOrganisations</a>
+  Fetches organisation details for the authenticated organization's API key.
