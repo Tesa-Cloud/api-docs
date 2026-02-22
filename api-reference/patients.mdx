@@ -3,14 +3,22 @@ title: 'Patient Information Endpoints'
 description: 'Create, edit and query patient personal and contact information'
 ---
 
-## Endpoints
+## Patient Profiles
 
-- <span class="badge post">POST</span> <a href="endpoint/post-createpatientprofile" target="_self">CreatePatientProfile</a>  
+- <span class="badge post">POST</span> <a href="endpoint/post-createpatientprofile" target="_self">CreatePatientProfile</a>
   Creates a new patient profile.
 
-- <span class="badge post">POST</span> <a href="endpoint/post-fetchmypatients" target="_self">FetchMyPatients</a>  
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchmypatients" target="_self">FetchMyPatients</a>
   Fetches a paginated list of patients associated with the authenticated organization's API key.
 
-- <span class="badge post">POST</span> <a href="endpoint/post-fetchpatientprofile" target="_self">FetchPatientProfile</a>  
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchpatientprofile" target="_self">FetchPatientProfile</a>
   Fetches the profile of a single patient by their Tesa Cloud patient ID.
+
+## Patient Observations
+
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchpatientobservations" target="_self">FetchPatientObservations</a>
+  Fetches all clinical observation records for a patient including height, weight, and notes.
+
+- <span class="badge post">POST</span> <a href="endpoint/post-createpatientobservation" target="_self">CreatePatientObservation</a>
+  Creates a new patient observation record with height, weight, and other clinical measurements.
 

@@ -876,6 +876,115 @@
           }
         }
       }
+    },
+    "/createpatientobservation": {
+      "post": {
+        "description": "Creates a new patient observation record with height, weight, and other clinical measurements.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePatientObservationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Patient observation created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientObservation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fetchpatientobservations": {
+      "post": {
+        "description": "Fetches all observation records for a patient.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of patient observations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PatientObservation"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1637,6 +1746,110 @@
           "days_since_appointment": {
             "type": "integer",
             "description": "Number of days between appointment and survey submission"
+          }
+        }
+      },
+      "PatientIdRequest": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "integer",
+            "description": "Patient identifier"
+          }
+        },
+        "required": ["patient_id"]
+      },
+      "CreatePatientObservationRequest": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "integer",
+            "description": "Patient identifier"
+          },
+          "appointment_id": {
+            "type": "integer",
+            "description": "Optional appointment identifier to link observation"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Observation timestamp (defaults to current time)"
+          },
+          "height": {
+            "type": "string",
+            "description": "Patient height value"
+          },
+          "weight": {
+            "type": "string",
+            "description": "Patient weight value"
+          },
+          "height_units": {
+            "type": "string",
+            "description": "Height units (e.g., cm, in)"
+          },
+          "weight_units": {
+            "type": "string",
+            "description": "Weight units (e.g., kg, lbs)"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Clinical notes"
+          },
+          "attributes": {
+            "type": "string",
+            "description": "Additional attributes as JSON string"
+          }
+        },
+        "required": ["patient_id"]
+      },
+      "PatientObservation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Observation identifier"
+          },
+          "patient_id": {
+            "type": "integer",
+            "description": "Patient identifier"
+          },
+          "appointment_id": {
+            "type": "integer",
+            "description": "Linked appointment identifier (if any)"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the observation was recorded"
+          },
+          "height": {
+            "type": "string",
+            "description": "Patient height value"
+          },
+          "weight": {
+            "type": "string",
+            "description": "Patient weight value"
+          },
+          "height_units": {
+            "type": "string",
+            "description": "Height units"
+          },
+          "weight_units": {
+            "type": "string",
+            "description": "Weight units"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Clinical notes"
+          },
+          "attributes": {
+            "type": "string",
+            "description": "Additional attributes as JSON string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Record creation timestamp"
           }
         }
       }
