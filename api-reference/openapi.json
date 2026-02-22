@@ -1766,7 +1766,7 @@
             "type": "integer",
             "description": "Patient identifier"
           },
-          "appointment_id": {
+          "associated_appointment_id": {
             "type": "integer",
             "description": "Optional appointment identifier to link observation"
           },
@@ -1796,8 +1796,87 @@
             "description": "Clinical notes"
           },
           "attributes": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Additional attribute strings"
+          },
+          "pre_op": {
+            "type": "boolean",
+            "description": "Whether this is a pre-operative observation"
+          },
+          "injured_ligaments": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of injured ligaments (e.g., ACL, MCL, PCL, LCL)"
+          },
+          "injury_date": {
             "type": "string",
-            "description": "Additional attributes as JSON string"
+            "format": "date-time",
+            "description": "Date of injury/onset"
+          },
+          "sane": {
+            "type": "integer",
+            "description": "SANE score (Single Assessment Numeric Evaluation, 0-100)"
+          },
+          "xray": {
+            "type": "boolean",
+            "description": "X-ray scan included"
+          },
+          "mri": {
+            "type": "boolean",
+            "description": "MRI scan included"
+          },
+          "ct": {
+            "type": "boolean",
+            "description": "CT scan included"
+          },
+          "ultrasound": {
+            "type": "boolean",
+            "description": "Ultrasound scan included"
+          },
+          "scan_outcome": {
+            "type": "string",
+            "description": "Overall scan outcome/findings"
+          },
+          "test_lachmans": {
+            "type": "string",
+            "description": "Lachman's test result"
+          },
+          "test_pivot_shift": {
+            "type": "string",
+            "description": "Pivot shift test result"
+          },
+          "test_anterior_drawer": {
+            "type": "string",
+            "description": "Anterior drawer test result"
+          },
+          "test_posterior_drawer": {
+            "type": "string",
+            "description": "Posterior drawer test result"
+          },
+          "test_varus": {
+            "type": "string",
+            "description": "Varus stress test result"
+          },
+          "test_valgus": {
+            "type": "string",
+            "description": "Valgus stress test result"
+          },
+          "test_posterior_sag": {
+            "type": "string",
+            "description": "Posterior sag sign test result"
+          },
+          "test_quad_active": {
+            "type": "string",
+            "description": "Quadriceps active test result"
+          },
+          "test_mcmurrays": {
+            "type": "string",
+            "description": "McMurray's test result"
+          },
+          "test_patellar_apprehension": {
+            "type": "string",
+            "description": "Patellar apprehension test result"
           }
         },
         "required": ["patient_id"]
@@ -1813,7 +1892,7 @@
             "type": "integer",
             "description": "Patient identifier"
           },
-          "appointment_id": {
+          "associated_appointment_id": {
             "type": "integer",
             "description": "Linked appointment identifier (if any)"
           },
@@ -1821,6 +1900,11 @@
             "type": "string",
             "format": "date-time",
             "description": "When the observation was recorded"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Record creation timestamp"
           },
           "height": {
             "type": "string",
@@ -1843,13 +1927,87 @@
             "description": "Clinical notes"
           },
           "attributes": {
-            "type": "string",
-            "description": "Additional attributes as JSON string"
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Additional attribute strings"
           },
-          "created_at": {
+          "pre_op": {
+            "type": "boolean",
+            "description": "Whether this is a pre-operative observation"
+          },
+          "injured_ligaments": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of injured ligaments"
+          },
+          "injury_date": {
             "type": "string",
             "format": "date-time",
-            "description": "Record creation timestamp"
+            "description": "Date of injury/onset"
+          },
+          "sane": {
+            "type": "integer",
+            "description": "SANE score (0-100)"
+          },
+          "xray": {
+            "type": "boolean",
+            "description": "X-ray scan included"
+          },
+          "mri": {
+            "type": "boolean",
+            "description": "MRI scan included"
+          },
+          "ct": {
+            "type": "boolean",
+            "description": "CT scan included"
+          },
+          "ultrasound": {
+            "type": "boolean",
+            "description": "Ultrasound scan included"
+          },
+          "scan_outcome": {
+            "type": "string",
+            "description": "Overall scan outcome/findings"
+          },
+          "test_lachmans": {
+            "type": "string",
+            "description": "Lachman's test result"
+          },
+          "test_pivot_shift": {
+            "type": "string",
+            "description": "Pivot shift test result"
+          },
+          "test_anterior_drawer": {
+            "type": "string",
+            "description": "Anterior drawer test result"
+          },
+          "test_posterior_drawer": {
+            "type": "string",
+            "description": "Posterior drawer test result"
+          },
+          "test_varus": {
+            "type": "string",
+            "description": "Varus stress test result"
+          },
+          "test_valgus": {
+            "type": "string",
+            "description": "Valgus stress test result"
+          },
+          "test_posterior_sag": {
+            "type": "string",
+            "description": "Posterior sag sign test result"
+          },
+          "test_quad_active": {
+            "type": "string",
+            "description": "Quadriceps active test result"
+          },
+          "test_mcmurrays": {
+            "type": "string",
+            "description": "McMurray's test result"
+          },
+          "test_patellar_apprehension": {
+            "type": "string",
+            "description": "Patellar apprehension test result"
           }
         }
       }
