@@ -3,13 +3,40 @@ title: 'Appointments & Procedures Endpoints'
 description: 'Create, edit and query appointment & procedure information'
 ---
 
-## Endpoints
+## Appointments
 
 - <span class="badge post">POST</span> <a href="endpoint/post-fetchappointments" target="_self">FetchAppointments</a>
   Fetches a paginated list of appointments within a date range for the authenticated organization.
 
 - <span class="badge post">POST</span> <a href="endpoint/post-createappointment" target="_self">CreateAppointment</a>
   Creates a new appointment for a patient with optional procedure templates.
+
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchappointmentnotes" target="_self">FetchAppointmentNotes</a>
+  Fetches active, unhidden notes for an appointment.
+
+- <span class="badge post">POST</span> <a href="endpoint/post-createappointmentnote" target="_self">CreateAppointmentNote</a>
+  Creates a new note for an appointment.
+
+## Procedures
+
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchprocedures" target="_self">FetchProcedures</a>
+  Fetches procedures for an appointment.
+
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchproceduredetails" target="_self">FetchProcedureDetails</a>
+  Fetches detailed procedure information by procedure ID and appointment ID.
+
+- <span class="badge post">POST</span> <a href="endpoint/post-setproceduredetails" target="_self">SetProcedureDetails</a>
+  Updates procedure details for a specific procedure.
+
+- <span class="badge post">POST</span> <a href="endpoint/post-recordtourniquettime" target="_self">RecordTourniquetTime</a>
+  Records tourniquet time for a procedure. Provide either start/end times or minutes directly.
+
+## Reports
+
+- <span class="badge post">POST</span> <a href="endpoint/post-fetchpostopreport" target="_self">FetchPostopReport</a>
+  Fetches the post-op report PDF URL for an appointment.
+
+## Reference Data
 
 - <span class="badge post">POST</span> <a href="endpoint/post-fetchlocations" target="_self">FetchLocations</a>
   Fetches a list of locations associated with the authenticated organization's API key.

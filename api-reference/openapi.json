@@ -443,6 +443,439 @@
           }
         }
       }
+    },
+    "/recordtourniquettime": {
+      "post": {
+        "description": "Records tourniquet time for a procedure. Provide either start_time and end_time, or minutes directly.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordTourniquetTimeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tourniquet time recorded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TourniquetTimeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fetchappointmentnotes": {
+      "post": {
+        "description": "Fetches active, unhidden notes for an appointment.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of appointment notes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentNote"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fetchprocedures": {
+      "post": {
+        "description": "Fetches procedures for an appointment.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of procedures",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProcedureSummary"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fetchproceduredetails": {
+      "post": {
+        "description": "Fetches detailed procedure information by procedure ID and appointment ID.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcedureAppointmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Procedure details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcedureDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/setproceduredetails": {
+      "post": {
+        "description": "Updates procedure details for a specific procedure.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetProcedureDetailsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Procedure details updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetProcedureDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/createappointmentnote": {
+      "post": {
+        "description": "Creates a new note for an appointment.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppointmentNoteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Note created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentNoteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fetchpostopreport": {
+      "post": {
+        "description": "Fetches the post-op report PDF URL for an appointment.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post-op report information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostopReportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fetchsurveyresponses": {
+      "post": {
+        "description": "Fetches survey responses for an appointment.",
+        "security": [
+          {
+            "ApiKeyHeader": [],
+            "ApiSecretHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of survey responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SurveyResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -951,6 +1384,261 @@
           "status",
           "created_at"
         ]
+      },
+      "RecordTourniquetTimeRequest": {
+        "type": "object",
+        "properties": {
+          "appointment_id": {
+            "type": "integer",
+            "description": "Appointment identifier"
+          },
+          "procedure_id": {
+            "type": "integer",
+            "description": "Procedure identifier"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Tourniquet start time (ISO 8601)"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Tourniquet end time (ISO 8601)"
+          },
+          "minutes": {
+            "type": "integer",
+            "description": "Tourniquet time in minutes (alternative to start/end times)"
+          }
+        },
+        "required": ["appointment_id", "procedure_id"]
+      },
+      "TourniquetTimeResponse": {
+        "type": "object",
+        "properties": {
+          "procedure_id": {
+            "type": "integer"
+          },
+          "appointment_id": {
+            "type": "integer"
+          },
+          "tourniquet_minutes": {
+            "type": "integer",
+            "description": "Recorded tourniquet time in minutes"
+          }
+        }
+      },
+      "AppointmentIdRequest": {
+        "type": "object",
+        "properties": {
+          "appointment_id": {
+            "type": "integer",
+            "description": "Appointment identifier"
+          }
+        },
+        "required": ["appointment_id"]
+      },
+      "AppointmentNote": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Note text content"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the note was recorded"
+          }
+        }
+      },
+      "ProcedureSummary": {
+        "type": "object",
+        "properties": {
+          "procedure_id": {
+            "type": "integer",
+            "description": "Procedure identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Procedure title"
+          }
+        }
+      },
+      "ProcedureAppointmentRequest": {
+        "type": "object",
+        "properties": {
+          "procedure_id": {
+            "type": "integer",
+            "description": "Procedure identifier"
+          },
+          "appointment_id": {
+            "type": "integer",
+            "description": "Appointment identifier"
+          }
+        },
+        "required": ["procedure_id", "appointment_id"]
+      },
+      "ProcedureDetails": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "ligament": { "type": "string" },
+          "procedure_type": { "type": "string" },
+          "graft_type": { "type": "string" },
+          "graft_origin": { "type": "string" },
+          "hamstring_type": { "type": "string" },
+          "quad_type": { "type": "string" },
+          "btb_type": { "type": "string" },
+          "graft_length": { "type": "number" },
+          "graft_diameter": { "type": "number" },
+          "pre_tension_force": { "type": "number" },
+          "pre_tension_duration": { "type": "number" },
+          "femur_drilling_technique": { "type": "string" },
+          "femur_socket_size": { "type": "number" },
+          "femur_fixation": { "type": "string" },
+          "tibia_drilling_technique": { "type": "string" },
+          "tibia_socket_size": { "type": "number" },
+          "tibia_fixation": { "type": "string" },
+          "tibia_backup_fixation": { "type": "string" },
+          "augment_type": { "type": "string" },
+          "augment_femoral_fixation": { "type": "string" },
+          "augment_tibial_fixation": { "type": "string" },
+          "tourniquet_time": { "type": "string" },
+          "active": { "type": "boolean" }
+        }
+      },
+      "ProcedureDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "procedure_id": { "type": "integer" },
+          "appointment_id": { "type": "integer" },
+          "start_time": { "type": "string", "format": "date-time" },
+          "end_time": { "type": "string", "format": "date-time" },
+          "fixated_tension_graft": { "type": "number" },
+          "fixated_tension_brace": { "type": "number" },
+          "femoral_tunnel_position": { "type": "string" },
+          "femoral_tunnel_angle": { "type": "string" },
+          "no_of_tensioners": { "type": "integer" },
+          "kit_id": { "type": "integer" },
+          "details": {
+            "$ref": "#/components/schemas/ProcedureDetails"
+          }
+        }
+      },
+      "SetProcedureDetailsRequest": {
+        "type": "object",
+        "properties": {
+          "procedure_id": { "type": "integer", "description": "Procedure identifier" },
+          "appointment_id": { "type": "integer", "description": "Appointment identifier" },
+          "title": { "type": "string" },
+          "ligament": { "type": "string" },
+          "procedure_type": { "type": "string" },
+          "graft_type": { "type": "string" },
+          "graft_origin": { "type": "string" },
+          "hamstring_type": { "type": "string" },
+          "quad_type": { "type": "string" },
+          "btb_type": { "type": "string" },
+          "graft_length": { "type": "number" },
+          "graft_diameter": { "type": "number" },
+          "pre_tension_force": { "type": "number" },
+          "pre_tension_duration": { "type": "number" },
+          "femur_drilling_technique": { "type": "string" },
+          "femur_socket_size": { "type": "number" },
+          "femur_fixation": { "type": "string" },
+          "tibia_drilling_technique": { "type": "string" },
+          "tibia_socket_size": { "type": "number" },
+          "tibia_fixation": { "type": "string" },
+          "tibia_backup_fixation": { "type": "string" },
+          "augment_type": { "type": "string" },
+          "augment_femoral_fixation": { "type": "string" },
+          "augment_tibial_fixation": { "type": "string" },
+          "tourniquet_time": { "type": "string" }
+        },
+        "required": ["procedure_id", "appointment_id"]
+      },
+      "SetProcedureDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "procedure_id": { "type": "integer" },
+          "appointment_id": { "type": "integer" },
+          "updated": { "type": "boolean" },
+          "details": {
+            "$ref": "#/components/schemas/ProcedureDetails"
+          }
+        }
+      },
+      "CreateAppointmentNoteRequest": {
+        "type": "object",
+        "properties": {
+          "appointment_id": {
+            "type": "integer",
+            "description": "Appointment identifier"
+          },
+          "note": {
+            "type": "string",
+            "description": "Note text content"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Note timestamp (defaults to current time)"
+          }
+        },
+        "required": ["appointment_id", "note"]
+      },
+      "AppointmentNoteResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "Note identifier" },
+          "appointment_id": { "type": "integer" },
+          "note": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PostopReportResponse": {
+        "type": "object",
+        "properties": {
+          "appointment_id": { "type": "integer" },
+          "report_id": { "type": "integer", "description": "Report record identifier" },
+          "report_url": {
+            "type": "string",
+            "description": "URL to the PDF report (may be GCS path requiring signing)"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["generated", "not_generated", "pending"],
+            "description": "Report generation status"
+          },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "SurveyResponse": {
+        "type": "object",
+        "properties": {
+          "submission_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the survey response was submitted"
+          },
+          "question_text": {
+            "type": "string",
+            "description": "The survey question text"
+          },
+          "response_text": {
+            "type": "string",
+            "description": "Free-text response (if applicable)"
+          },
+          "response_value": {
+            "type": "integer",
+            "description": "Numeric response value"
+          },
+          "days_since_appointment": {
+            "type": "integer",
+            "description": "Number of days between appointment and survey submission"
+          }
+        }
       }
     },
     "securitySchemes": {
