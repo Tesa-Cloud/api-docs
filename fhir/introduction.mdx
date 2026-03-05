@@ -1,0 +1,170 @@
+---
+title: 'FHIR R4 Integration'
+description: 'Exchange clinical data with Tesa Cloud using the HL7 FHIR R4 standard'
+---
+
+<Note>
+  The FHIR R4 API uses the same API key credentials as the REST API. You must enable developer access in **Settings → Developer Settings** to generate keys. Only **primary users** can create API keys.
+</Note>
+
+## Overview
+
+Tesa Cloud exposes clinical and administrative data as standards-compliant [HL7 FHIR R4](http://hl7.org/fhir/R4/) resources. This enables seamless integration with hospital EHRs, patient management systems, and other healthcare applications that speak FHIR.
+
+If your system already supports FHIR R4, you can query Tesa Cloud data using standard FHIR RESTful interactions — no custom adapters needed.
+
+<CardGroup cols={2}>
+  <Card
+    title="Read & Search"
+    icon="magnifying-glass"
+    href="/fhir/resources"
+  >
+    Query patients, appointments, procedures, observations, and reports using standard FHIR search parameters.
+  </Card>
+  <Card
+    title="Create & Update"
+    icon="pen-to-square"
+    href="/fhir/write-operations"
+  >
+    Create patients and update procedure details via standard FHIR interactions.
+  </Card>
+  <Card
+    title="Import from EHR"
+    icon="file-import"
+    href="/fhir/import"
+  >
+    Import patient records from external FHIR servers directly into Tesa Cloud.
+  </Card>
+  <Card
+    title="Surgical Extensions"
+    icon="bone"
+    href="/fhir/extensions"
+  >
+    Access Tesa-specific surgical data — graft details, tension readings, fixation — via FHIR extensions.
+  </Card>
+</CardGroup>
+
+---
+
+## Base URL
+
+All FHIR endpoints are available under the `/fhir/r4` path:
+
+```
+https://us-central1-tesa-cloud-production.cloudfunctions.net/tesaFhir/fhir/r4
+```
+
+<Warning>
+  During the preview period, the FHIR API is served from the Cloud Function URL above. A custom domain (e.g., `fhir.tesacloud.com`) will be configured for general availability.
+</Warning>
+
+---
+
+## Supported Resources
+
+Tesa Cloud exposes 12 FHIR R4 resource types:
+
+| Resource | Read | Search | Create | Update | Description |
+|---|---|---|---|---|---|
+| [Patient](/fhir/resources#patient) | Yes | Yes | Yes | Yes | Demographics, identifiers, contact info |
+| [Practitioner](/fhir/resources#practitioner) | Yes | Yes | — | — | Surgeons and clinical staff |
+| [Organization](/fhir/resources#organization) | Yes | Yes | — | — | Clinics and surgical centers |
+| [Location](/fhir/resources#location) | Yes | Yes | — | — | Operating rooms and facilities |
+| [Appointment](/fhir/resources#appointment) | Yes | Yes | — | — | Scheduled surgical cases |
+| [Encounter](/fhir/resources#encounter) | Yes | Yes | — | — | Surgical encounters (derived from procedures) |
+| [Procedure](/fhir/resources#procedure) | Yes | Yes | — | Yes | Surgical procedures with clinical detail |
+| [Observation](/fhir/resources#observation) | Yes | Yes | — | — | Patient observations, clinical tests, imaging |
+| [DiagnosticReport](/fhir/resources#diagnosticreport) | Yes | Yes | — | — | Post-operative report summaries |
+| [DocumentReference](/fhir/resources#documentreference) | Yes | Yes | — | — | PDF report documents |
+| [Device](/fhir/resources#device) | Yes | Yes | — | — | Surgical kits and tensioner devices |
+| [QuestionnaireResponse](/fhir/resources#questionnaireresponse) | Yes | Yes | — | — | Patient-reported outcome surveys |
+
+---
+
+## Quick Example
+
+Fetch all patients with last name "Smith":
+
+```bash
+curl -H "x-api-key: YOUR_KEY" \
+     -H "x-api-secret: YOUR_SECRET" \
+     -H "Accept: application/fhir+json" \
+     "https://{base}/fhir/r4/Patient?family=Smith"
+```
+
+Response — a FHIR Bundle:
+
+```json
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 1,
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "42",
+        "name": [{ "family": "Smith", "given": ["J"] }],
+        "gender": "male",
+        "birthDate": "1985",
+        "identifier": [{
+          "system": "https://tesacloud.com/fhir/sid/ehr-id",
+          "value": "EHR-001"
+        }],
+        "managingOrganization": {
+          "reference": "Organization/1"
+        }
+      },
+      "search": { "mode": "match" }
+    }
+  ]
+}
+```
+
+---
+
+## CapabilityStatement
+
+The server's full capabilities are available at the unauthenticated metadata endpoint:
+
+```bash
+curl https://{base}/fhir/r4/metadata
+```
+
+This returns a FHIR [CapabilityStatement](http://hl7.org/fhir/R4/capabilitystatement.html) describing all supported resources, interactions, and search parameters.
+
+---
+
+## Key Concepts
+
+### Organisation Scoping
+
+All data returned by the FHIR API is scoped to the organisation associated with your API key. You will only see patients, appointments, and procedures belonging to your organisation — even if the same database contains data from other organisations.
+
+### Content Type
+
+All responses use `Content-Type: application/fhir+json`. The API does not support XML — requests with `Accept: application/fhir+xml` will receive a `406 Not Acceptable` response.
+
+### Error Responses
+
+All errors are returned as FHIR [OperationOutcome](http://hl7.org/fhir/R4/operationoutcome.html) resources:
+
+```json
+{
+  "resourceType": "OperationOutcome",
+  "issue": [{
+    "severity": "error",
+    "code": "not-found",
+    "diagnostics": "Patient/999 not found"
+  }]
+}
+```
+
+| HTTP Status | FHIR Code | Meaning |
+|---|---|---|
+| 400 | `invalid` | Malformed request or missing required fields |
+| 401 | `security` | Missing or invalid API credentials |
+| 404 | `not-found` | Resource does not exist (or belongs to another org) |
+| 405 | `not-supported` | Interaction not supported for this resource |
+| 406 | `not-supported` | XML format requested (only JSON is supported) |
+| 500 | `exception` | Unexpected server error |

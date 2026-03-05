@@ -1,0 +1,178 @@
+---
+title: 'Search & Pagination'
+description: 'How to search, filter, paginate, and include related resources'
+---
+
+## Search Basics
+
+All search requests return a FHIR [Bundle](http://hl7.org/fhir/R4/bundle.html) with `type: "searchset"`:
+
+```bash
+GET /fhir/r4/{ResourceType}?param1=value1&param2=value2
+```
+
+The Bundle contains:
+- `total` — Total matching resources across all pages
+- `link[]` — Pagination URLs (`self`, `next`, `previous`)
+- `entry[]` — Matched resources
+
+---
+
+## Pagination
+
+Control result size with `_count` and `_offset`:
+
+| Parameter | Default | Max | Description |
+|---|---|---|---|
+| `_count` | 20 | 100 | Results per page |
+| `_offset` | 0 | — | Starting position |
+
+### Example: Page Through Results
+
+```bash
+# First page (20 results)
+GET /fhir/r4/Patient?family=Smith
+
+# Second page
+GET /fhir/r4/Patient?family=Smith&_count=20&_offset=20
+```
+
+The response includes navigation links:
+
+```json
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 53,
+  "link": [
+    { "relation": "self", "url": "https://.../Patient?family=Smith&_count=20&_offset=0" },
+    { "relation": "next", "url": "https://.../Patient?family=Smith&_count=20&_offset=20" }
+  ],
+  "entry": [ ... ]
+}
+```
+
+---
+
+## Date Prefixes
+
+Date search parameters support comparison prefixes. If no prefix is specified, `eq` (equals) is assumed.
+
+| Prefix | Meaning | Example |
+|---|---|---|
+| `eq` | Equals (default) | `birthdate=1985` |
+| `gt` | After | `date=gt2024-01-01` |
+| `lt` | Before | `date=lt2025-01-01` |
+| `ge` | On or after | `birthdate=ge1980` |
+| `le` | On or before | `birthdate=le2000` |
+| `ne` | Not equal | `birthdate=ne1990` |
+
+### Example: Appointments in a Date Range
+
+```bash
+GET /fhir/r4/Appointment?date=ge2024-06-01&date=le2024-06-30
+```
+
+---
+
+## Token Parameters
+
+Token parameters (identifiers, codes) support the format `system|code` or just `code`:
+
+```bash
+# Search by EHR ID with system
+GET /fhir/r4/Patient?identifier=https://tesacloud.com/fhir/sid/ehr-id|EHR-001
+
+# Search by EHR ID (code only)
+GET /fhir/r4/Patient?identifier=EHR-001
+
+# Search by gender code
+GET /fhir/r4/Patient?gender=male
+```
+
+---
+
+## Reference Parameters
+
+Reference parameters accept either a full reference or just the ID:
+
+```bash
+# Full reference format
+GET /fhir/r4/Procedure?patient=Patient/42
+
+# ID only
+GET /fhir/r4/Procedure?patient=42
+```
+
+---
+
+## Including Related Resources
+
+### _include (Forward)
+
+Fetch resources **referenced by** the search results in a single request. This avoids N+1 queries.
+
+**Format:** `_include={SourceType}:{searchParam}`
+
+```bash
+# Fetch procedures and their referenced patients
+GET /fhir/r4/Procedure?patient=Patient/42&_include=Procedure:patient
+
+# Fetch procedures with encounter details
+GET /fhir/r4/Procedure?patient=Patient/42&_include=Procedure:encounter
+
+# Fetch appointments with all participants
+GET /fhir/r4/Appointment?date=ge2024-01-01&_include=Appointment:patient&_include=Appointment:practitioner&_include=Appointment:location
+```
+
+### _revinclude (Reverse)
+
+Fetch resources that **reference** the search results.
+
+**Format:** `_revinclude={SourceType}:{searchParam}`
+
+```bash
+# Fetch a patient and all their procedures
+GET /fhir/r4/Patient?_id=42&_revinclude=Procedure:patient
+
+# Fetch a patient and all their observations
+GET /fhir/r4/Patient?_id=42&_revinclude=Observation:patient
+```
+
+### How Included Resources Appear
+
+Primary results have `search.mode: "match"`. Included resources have `search.mode: "include"`:
+
+```json
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 2,
+  "entry": [
+    {
+      "resource": { "resourceType": "Procedure", "id": "7", ... },
+      "search": { "mode": "match" }
+    },
+    {
+      "resource": { "resourceType": "Patient", "id": "42", ... },
+      "search": { "mode": "include" }
+    }
+  ]
+}
+```
+
+### Supported Include Paths
+
+| _include | Reference followed |
+|---|---|
+| `Patient:organization` | `managingOrganization` |
+| `Appointment:patient` | Patient participant |
+| `Appointment:practitioner` | Practitioner participant |
+| `Appointment:location` | Location participant |
+| `Procedure:patient` | `subject` |
+| `Procedure:encounter` | `encounter` |
+| `Observation:patient` | `subject` |
+| `Observation:encounter` | `encounter` |
+| `DiagnosticReport:patient` | `subject` |
+| `DocumentReference:patient` | `subject` |
+| `QuestionnaireResponse:patient` | `subject` |

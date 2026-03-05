@@ -1,0 +1,208 @@
+---
+title: 'Extensions & Terminology'
+description: 'Tesa-specific FHIR extensions for surgical procedures and clinical coding'
+---
+
+## Overview
+
+Tesa Cloud uses FHIR R4 [extensions](http://hl7.org/fhir/R4/extensibility.html) to represent surgical data that has no standard FHIR equivalent — such as graft specifications, fixation devices, and intraoperative tension readings.
+
+All extensions use the base URL:
+
+```
+https://tesacloud.com/fhir/StructureDefinition/{extension-name}
+```
+
+Extensions appear on **Procedure** resources and can be read on search/read and written via `PUT /fhir/r4/Procedure/{id}`.
+
+---
+
+## Procedure Extensions
+
+### Graft
+
+| Extension | Value Type | Description |
+|---|---|---|
+| `graft-type` | CodeableConcept | Graft type (SNOMED coded — see below) |
+| `graft-origin` | string | Origin tissue |
+| `graft-length` | decimal | Length in mm |
+| `graft-diameter` | decimal | Diameter in mm |
+| `hamstring-type` | string | Hamstring graft variant |
+| `quad-type` | string | Quadriceps graft variant |
+| `btb-type` | string | Bone-tendon-bone variant |
+
+### Fixation
+
+| Extension | Value Type | Description |
+|---|---|---|
+| `femur-fixation` | string | Femoral fixation device |
+| `femur-drilling-technique` | string | Femoral drilling technique |
+| `femur-socket-size` | decimal | Femoral socket size (mm) |
+| `tibia-fixation` | string | Tibial fixation device |
+| `tibia-drilling-technique` | string | Tibial drilling technique |
+| `tibia-socket-size` | decimal | Tibial socket size (mm) |
+| `tibia-backup-fixation` | string | Tibial backup fixation |
+
+### Tension
+
+| Extension | Value Type | Description |
+|---|---|---|
+| `pre-tension-force` | decimal | Pre-tension force (Newtons) |
+| `pre-tension-duration` | integer | Pre-tension duration (seconds) |
+| `fixated-tension-graft` | decimal | Final graft tension at fixation (Newtons) |
+| `fixated-tension-brace` | decimal | Brace tension at fixation (Newtons) |
+
+### Tunnel
+
+| Extension | Value Type | Description |
+|---|---|---|
+| `femoral-tunnel-position` | string | Clock position of femoral tunnel |
+| `femoral-tunnel-angle` | decimal | Tunnel angle (degrees) |
+
+### Augmentation
+
+| Extension | Value Type | Description |
+|---|---|---|
+| `augment-type` | string | Augmentation type |
+| `augment-femoral-fixation` | string | Femoral augment fixation |
+| `augment-tibial-fixation` | string | Tibial augment fixation |
+
+### Other
+
+| Extension | Value Type | Description |
+|---|---|---|
+| `tourniquet-time` | string | Tourniquet time |
+
+---
+
+## Extension Example
+
+A Procedure resource with surgical extensions:
+
+```json
+{
+  "resourceType": "Procedure",
+  "id": "7",
+  "status": "completed",
+  "code": {
+    "coding": [{
+      "system": "http://snomed.info/sct",
+      "code": "31154006",
+      "display": "Anterior cruciate ligament structure"
+    }]
+  },
+  "subject": { "reference": "Patient/42" },
+  "encounter": { "reference": "Encounter/15" },
+  "extension": [
+    {
+      "url": "https://tesacloud.com/fhir/StructureDefinition/graft-type",
+      "valueCodeableConcept": {
+        "coding": [{
+          "system": "http://snomed.info/sct",
+          "code": "21753001",
+          "display": "Autogenous graft"
+        }]
+      }
+    },
+    {
+      "url": "https://tesacloud.com/fhir/StructureDefinition/graft-length",
+      "valueDecimal": 28.5
+    },
+    {
+      "url": "https://tesacloud.com/fhir/StructureDefinition/femur-fixation",
+      "valueString": "Endobutton CL"
+    },
+    {
+      "url": "https://tesacloud.com/fhir/StructureDefinition/fixated-tension-graft",
+      "valueDecimal": 80.0
+    }
+  ]
+}
+```
+
+---
+
+## SNOMED CT Codes
+
+### Ligament Types
+
+Used in `Procedure.code`:
+
+| Ligament | SNOMED Code | Display |
+|---|---|---|
+| ACL | `31154006` | Anterior cruciate ligament structure |
+| PCL | `39814004` | Posterior cruciate ligament structure |
+| MCL | `28618007` | Medial collateral ligament structure |
+| LCL | `69790007` | Lateral collateral ligament structure |
+| MPFL | `182442004` | Medial patellofemoral ligament structure |
+
+### Procedure Types
+
+| Type | SNOMED Code | Display |
+|---|---|---|
+| Reconstruction | `236001` | Reconstruction |
+| Repair | `3137001` | Repair |
+
+### Graft Types
+
+Used in the `graft-type` extension:
+
+| Type | SNOMED Code | Display |
+|---|---|---|
+| Autograft | `21753001` | Autogenous graft |
+| Allograft | `57368009` | Allograft |
+| Synthetic | `272564008` | Synthetic graft |
+
+### Clinical Tests
+
+Used in Observation resources:
+
+| Test | SNOMED Code |
+|---|---|
+| Lachman | `710041009` |
+| Pivot shift | `710044001` |
+| Anterior drawer | `65477003` |
+| Posterior drawer | `710043007` |
+| Varus stress | `165257002` |
+| Valgus stress | `165258007` |
+| Posterior sag | `710042002` |
+| Quadriceps active | `710045000` |
+| McMurray | `34153003` |
+| Patellar apprehension | `710046004` |
+
+### Imaging
+
+| Modality | SNOMED Code |
+|---|---|
+| X-ray | `168537006` |
+| MRI | `113091000` |
+| CT scan | `77477000` |
+| Ultrasound | `16310003` |
+
+---
+
+## LOINC Codes
+
+| Resource | Code | Display |
+|---|---|---|
+| Observation (height) | `8302-2` | Body height |
+| Observation (weight) | `29463-7` | Body weight |
+| DiagnosticReport | `28570-0` | Procedure note |
+
+---
+
+## Custom Tesa Code Systems
+
+### Identifier System
+
+`https://tesacloud.com/fhir/sid/ehr-id`
+
+Used in `Patient.identifier` to store the patient's external EHR identifier.
+
+### Observation Type
+
+`https://tesacloud.com/fhir/CodeSystem/observation-type`
+
+| Code | Display |
+|---|---|
+| `sane-score` | SANE Score |

@@ -1,0 +1,182 @@
+---
+title: 'EHR Import'
+description: 'Import patient records from external FHIR servers into Tesa Cloud'
+---
+
+## Overview
+
+Tesa Cloud can act as a FHIR **client**, connecting to your existing EHR or patient management system to import patient records. This is useful for:
+
+- Onboarding existing patients from a hospital EHR into Tesa Cloud
+- Searching an external system before creating duplicate records
+- Proxying FHIR searches to external servers
+
+<Note>
+  These operations require the external FHIR server to be accessible over the network from Google Cloud. If your EHR is behind a firewall, you may need to allowlist Tesa Cloud's IP range or use a VPN tunnel.
+</Note>
+
+---
+
+## Import Patient
+
+Import a patient from an external FHIR server into your Tesa Cloud organisation.
+
+```
+POST /fhir/r4/$import-patient
+```
+
+### Request
+
+```json
+{
+  "fhirServerUrl": "https://ehr.hospital.com/fhir",
+  "patientId": "abc-123",
+  "bearerToken": "optional-auth-token"
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `fhirServerUrl` | Yes | Base URL of the external FHIR server |
+| `patientId` | Yes | Patient ID on the external server |
+| `bearerToken` | No | Bearer token if the external server requires authentication |
+
+### What Happens
+
+1. Tesa connects to the external FHIR server and reads the patient record
+2. Related resources (encounters, procedures, observations) are fetched in parallel
+3. The patient is checked for duplicates — if a patient with the same EHR identifier already exists in your organisation, the existing record is returned
+4. If no duplicate exists, Tesa creates:
+   - A person record (name, gender, year of birth)
+   - A patient record linked to your organisation
+   - A contact record (email, phone, preferred language)
+5. The external server's patient identifier is stored as the patient's EHR ID in Tesa
+
+### Response
+
+A FHIR [Parameters](http://hl7.org/fhir/R4/parameters.html) resource with the Tesa patient ID:
+
+```json
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "patientId", "valueInteger": 42 },
+    { "name": "personId", "valueInteger": 101 },
+    { "name": "sourceServer", "valueUri": "https://ehr.hospital.com/fhir" },
+    { "name": "sourcePatientId", "valueString": "abc-123" }
+  ]
+}
+```
+
+### Field Mapping
+
+The import maps FHIR Patient fields to Tesa's data model:
+
+| FHIR Field | Tesa Field |
+|---|---|
+| `name[0].given[0]` | First name |
+| `name[0].family` | Last name |
+| `name[0].prefix[0]` | Title prefix |
+| `gender` | Gender (male→Male, female→Female, other→Other) |
+| `birthDate` | Year of birth (first 4 characters) |
+| `identifier[*].value` | EHR patient ID |
+| `telecom` (email) | Email address |
+| `telecom` (phone/sms) | Mobile phone |
+| `communication[0].language` | Preferred language |
+
+### Example
+
+```bash
+curl -X POST \
+  -H "x-api-key: $KEY" -H "x-api-secret: $SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fhirServerUrl": "https://ehr.hospital.com/fhir",
+    "patientId": "abc-123",
+    "bearerToken": "eyJhbGci..."
+  }' \
+  "https://{base}/fhir/r4/\$import-patient"
+```
+
+### Duplicate Prevention
+
+If a patient with the same EHR identifier already exists in your organisation, the import returns the existing patient and person IDs **without** creating a duplicate. This makes the operation safe to call repeatedly.
+
+---
+
+## Search External Server
+
+Search for resources on an external FHIR server without importing them. Useful for previewing data before import.
+
+```
+POST /fhir/r4/$search-external
+```
+
+### Request
+
+```json
+{
+  "fhirServerUrl": "https://ehr.hospital.com/fhir",
+  "resourceType": "Patient",
+  "searchParams": {
+    "family": "Smith",
+    "birthdate": "1985"
+  },
+  "bearerToken": "optional-auth-token"
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `fhirServerUrl` | Yes | Base URL of the external FHIR server |
+| `resourceType` | Yes | FHIR resource type to search |
+| `searchParams` | No | Key-value search parameters (passed through to external server) |
+| `bearerToken` | No | Bearer token for authenticated servers |
+
+### Response
+
+A standard FHIR searchset Bundle with results from the external server. The data is **not** stored in Tesa — this is a read-only proxy.
+
+### Example: Search External Patients
+
+```bash
+curl -X POST \
+  -H "x-api-key: $KEY" -H "x-api-secret: $SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fhirServerUrl": "https://ehr.hospital.com/fhir",
+    "resourceType": "Patient",
+    "searchParams": { "family": "Smith" }
+  }' \
+  "https://{base}/fhir/r4/\$search-external"
+```
+
+---
+
+## Integration Workflow
+
+A typical EHR integration follows this pattern:
+
+<Steps>
+  <Step title="Search the external EHR">
+    Use `$search-external` to find patients on the hospital's FHIR server.
+  </Step>
+  <Step title="Review matches">
+    Display the search results to the user. Let them select which patient to import.
+  </Step>
+  <Step title="Import the patient">
+    Use `$import-patient` with the selected patient's ID. Tesa automatically checks for duplicates.
+  </Step>
+  <Step title="Continue in Tesa">
+    Use the returned `patientId` to schedule appointments, create procedures, and manage care in Tesa Cloud.
+  </Step>
+</Steps>
+
+---
+
+## Security Notes
+
+- The `bearerToken` is forwarded to the external server and is **never stored** by Tesa Cloud
+- All imported patients are created under your organisation's ownership
+- External server URLs are not restricted — ensure you trust the FHIR server before connecting
+- The import operation is scoped to your authenticated organisation

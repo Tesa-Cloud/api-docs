@@ -1,0 +1,186 @@
+---
+title: 'Write Operations'
+description: 'Create patients and update procedure details via FHIR'
+---
+
+## Create Patient
+
+Create a new patient record in Tesa Cloud.
+
+```
+POST /fhir/r4/Patient
+```
+
+### Request Body
+
+Send a FHIR Patient resource:
+
+```json
+{
+  "resourceType": "Patient",
+  "name": [{
+    "family": "Smith",
+    "given": ["John"],
+    "prefix": ["Mr"]
+  }],
+  "gender": "male",
+  "birthDate": "1985",
+  "identifier": [{
+    "system": "https://tesacloud.com/fhir/sid/ehr-id",
+    "value": "EHR-12345"
+  }],
+  "telecom": [
+    { "system": "email", "value": "john.smith@example.com" },
+    { "system": "sms", "value": "+1-555-0123" }
+  ],
+  "communication": [{
+    "language": {
+      "coding": [{ "system": "urn:ietf:bcp:47", "code": "en" }]
+    }
+  }]
+}
+```
+
+### Field Mapping
+
+| FHIR Field | Required | Tesa Field |
+|---|---|---|
+| `name[0].family` | Recommended | Last name |
+| `name[0].given[0]` | Recommended | First name or initial |
+| `name[0].prefix[0]` | Optional | Title (Dr, Mr, Mrs, etc.) |
+| `gender` | Optional | `male`→Male, `female`→Female, `other`→Other |
+| `birthDate` | Optional | Year of birth (first 4 characters used) |
+| `identifier[0].value` | Optional | External EHR patient ID |
+| `telecom[system=email]` | Optional | Email address |
+| `telecom[system=sms]` | Optional | Mobile phone number |
+| `communication[0].language` | Optional | Preferred language (BCP-47 code) |
+
+### Supported Languages
+
+| BCP-47 Code | Language |
+|---|---|
+| `en` | English |
+| `es` | Spanish |
+| `fr` | French |
+| `pt` | Portuguese |
+| `ar` | Arabic |
+| `zh` | Chinese |
+| `hi` | Hindi |
+
+### Response
+
+**201 Created** with the full Patient resource and a `Location` header:
+
+```
+Location: https://{base}/fhir/r4/Patient/42
+```
+
+```json
+{
+  "resourceType": "Patient",
+  "id": "42",
+  "name": [{ "family": "Smith", "given": ["John"], "prefix": ["Mr"] }],
+  "gender": "male",
+  "birthDate": "1985",
+  "identifier": [{
+    "system": "https://tesacloud.com/fhir/sid/ehr-id",
+    "value": "EHR-12345"
+  }],
+  "managingOrganization": { "reference": "Organization/1" }
+}
+```
+
+### Example
+
+```bash
+curl -X POST \
+  -H "x-api-key: $KEY" -H "x-api-secret: $SECRET" \
+  -H "Content-Type: application/fhir+json" \
+  -d '{
+    "resourceType": "Patient",
+    "name": [{"family": "Smith", "given": ["John"]}],
+    "gender": "male",
+    "birthDate": "1985",
+    "identifier": [{"system": "https://tesacloud.com/fhir/sid/ehr-id", "value": "EHR-12345"}],
+    "telecom": [{"system": "email", "value": "john@example.com"}]
+  }' \
+  "https://{base}/fhir/r4/Patient"
+```
+
+---
+
+## Update Patient
+
+Update an existing patient's demographics and contact information.
+
+```
+PUT /fhir/r4/Patient/{id}
+```
+
+Send the full Patient resource in the request body. The API updates only the fields present in the resource — it will not clear fields that are omitted.
+
+### Example
+
+```bash
+curl -X PUT \
+  -H "x-api-key: $KEY" -H "x-api-secret: $SECRET" \
+  -H "Content-Type: application/fhir+json" \
+  -d '{
+    "resourceType": "Patient",
+    "id": "42",
+    "name": [{"family": "Smith-Jones", "given": ["John"]}],
+    "telecom": [{"system": "email", "value": "john.jones@example.com"}]
+  }' \
+  "https://{base}/fhir/r4/Patient/42"
+```
+
+**200 OK** with the updated Patient resource.
+
+Returns `404 Not Found` if the patient does not exist or belongs to a different organisation.
+
+---
+
+## Update Procedure
+
+Update surgical procedure details via FHIR [extensions](/fhir/extensions).
+
+```
+PUT /fhir/r4/Procedure/{id}
+```
+
+Procedure updates use the `extension[]` array to set surgical parameters. Each extension is identified by its URL suffix under `https://tesacloud.com/fhir/StructureDefinition/`.
+
+### Example: Update Graft and Fixation Details
+
+```bash
+curl -X PUT \
+  -H "x-api-key: $KEY" -H "x-api-secret: $SECRET" \
+  -H "Content-Type: application/fhir+json" \
+  -d '{
+    "resourceType": "Procedure",
+    "id": "7",
+    "extension": [
+      {
+        "url": "https://tesacloud.com/fhir/StructureDefinition/graft-length",
+        "valueDecimal": 28.5
+      },
+      {
+        "url": "https://tesacloud.com/fhir/StructureDefinition/graft-diameter",
+        "valueDecimal": 8.0
+      },
+      {
+        "url": "https://tesacloud.com/fhir/StructureDefinition/femur-fixation",
+        "valueString": "Endobutton CL"
+      },
+      {
+        "url": "https://tesacloud.com/fhir/StructureDefinition/fixated-tension-graft",
+        "valueDecimal": 80.0
+      }
+    ]
+  }' \
+  "https://{base}/fhir/r4/Procedure/7"
+```
+
+**200 OK** with the full updated Procedure resource.
+
+See the [Extensions](/fhir/extensions) page for the complete list of writable extensions.

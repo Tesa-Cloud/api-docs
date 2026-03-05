@@ -1,0 +1,341 @@
+---
+title: 'Resources'
+description: 'FHIR R4 resource types, field mappings, and search parameters'
+---
+
+## Endpoint Pattern
+
+FHIR uses RESTful URLs with the resource type in the path:
+
+| Action | Method | URL Pattern | Example |
+|---|---|---|---|
+| Read | `GET` | `/fhir/r4/{Type}/{id}` | `GET /fhir/r4/Patient/42` |
+| Search | `GET` | `/fhir/r4/{Type}?params` | `GET /fhir/r4/Patient?family=Smith` |
+| Create | `POST` | `/fhir/r4/{Type}` | `POST /fhir/r4/Patient` |
+| Update | `PUT` | `/fhir/r4/{Type}/{id}` | `PUT /fhir/r4/Procedure/7` |
+
+All endpoints except `GET /fhir/r4/metadata` require `x-api-key` and `x-api-secret` headers.
+
+---
+
+## Patient
+
+The Patient resource maps to Tesa's patient records, including demographics, identifiers, and contact information.
+
+**Supported interactions:** read, search, create, update
+
+### Key Fields
+
+| FHIR Field | Description | Example |
+|---|---|---|
+| `id` | Tesa patient ID | `"42"` |
+| `identifier[0]` | External EHR identifier | `system: https://tesacloud.com/fhir/sid/ehr-id` |
+| `name[0].family` | Last name | `"Smith"` |
+| `name[0].given[0]` | First name or initial | `"J"` |
+| `gender` | `male`, `female`, `other`, `unknown` | `"male"` |
+| `birthDate` | Year of birth (partial date) | `"1985"` |
+| `telecom[]` | Email and SMS contacts | `system: "email"` or `"sms"` |
+| `communication[0].language` | Preferred language (BCP-47) | `"en"`, `"es"`, `"fr"` |
+| `managingOrganization` | Organisation reference | `"Organization/1"` |
+
+<Note>
+  For patient privacy, the `given` name may contain only an initial rather than the full first name. This is by design.
+</Note>
+
+### Search Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `_id` | token | Patient ID |
+| `identifier` | token | EHR identifier (e.g., `https://tesacloud.com/fhir/sid/ehr-id\|EHR-001`) |
+| `family` | string | Last name (case-insensitive, partial match) |
+| `given` | string | First name (case-insensitive, partial match) |
+| `gender` | token | `male`, `female`, `other` |
+| `birthdate` | date | Year of birth (supports [date prefixes](/fhir/search-guide#date-prefixes)) |
+| `organization` | reference | Organisation ID |
+
+### Example: Search by Last Name
+
+```bash
+curl -H "x-api-key: $KEY" -H "x-api-secret: $SECRET" \
+  "https://{base}/fhir/r4/Patient?family=Smith&_count=10"
+```
+
+---
+
+## Practitioner
+
+Surgeons and clinical staff linked to your organisation.
+
+**Supported interactions:** read, search
+
+### Key Fields
+
+| FHIR Field | Description |
+|---|---|
+| `id` | Provider ID |
+| `identifier[]` | Professional identifiers (NPI, AU HPII, NZ HPI) |
+| `name[0]` | Name with family, given, and prefix |
+| `address[0]` | Country, state, city |
+
+### Identifier Systems
+
+| Region | System URI |
+|---|---|
+| US (NPI) | `http://hl7.org/fhir/sid/us-npi` |
+| Australia (HPII) | `http://ns.electronichealth.net.au/id/hi/hpii/1.0` |
+| New Zealand (HPI) | `https://standards.digital.health.nz/ns/hpi-person-id` |
+
+### Search Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `_id` | token | Practitioner ID |
+| `name` | string | Name search (case-insensitive) |
+| `identifier` | token | Professional identifier value |
+
+---
+
+## Organization
+
+Your organisation's details. API keys are scoped to a single organisation, so search will return only your organisation.
+
+**Supported interactions:** read, search
+
+### Key Fields
+
+| FHIR Field | Description |
+|---|---|
+| `id` | Organisation ID |
+| `name` | Business name |
+| `telecom[]` | Phone and email |
+
+---
+
+## Location
+
+Operating rooms, clinics, and facilities linked to your organisation.
+
+**Supported interactions:** read, search
+
+### Key Fields
+
+| FHIR Field | Description |
+|---|---|
+| `id` | Location ID |
+| `name` | Location description |
+| `status` | `active` or `inactive` |
+| `address` | Full address (street, city, state, postcode, country) |
+| `managingOrganization` | Organisation reference |
+
+### Search Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `_id` | token | Location ID |
+| `name` | string | Description (case-insensitive) |
+| `address-city` | string | City name |
+| `status` | token | `active` or `inactive` |
+
+---
+
+## Appointment
+
+Scheduled surgical cases with patient, surgeon, and location references.
+
+**Supported interactions:** read, search
+
+### Key Fields
+
+| FHIR Field | Description |
+|---|---|
+| `id` | Appointment ID |
+| `status` | `booked`, `arrived`, `fulfilled`, `cancelled` |
+| `start` | Scheduled date/time (ISO 8601) |
+| `participant[]` | References to Patient, Practitioner, and Location |
+| `description` | Appointment notes |
+
+### Status Mapping
+
+Tesa Cloud uses slightly different status labels internally. The FHIR API maps them:
+
+| Tesa Status | FHIR Status |
+|---|---|
+| pending | `booked` |
+| in progress | `arrived` |
+| complete | `fulfilled` |
+| cancelled | `cancelled` |
+
+### Search Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `_id` | token | Appointment ID |
+| `patient` | reference | Patient ID (e.g., `Patient/42` or `42`) |
+| `practitioner` | reference | Practitioner ID |
+| `location` | reference | Location ID |
+| `date` | date | Scheduled date (supports [date prefixes](/fhir/search-guide#date-prefixes)) |
+| `status` | token | FHIR appointment status |
+
+### Example: Upcoming Appointments
+
+```bash
+curl -H "x-api-key: $KEY" -H "x-api-secret: $SECRET" \
+  "https://{base}/fhir/r4/Appointment?date=ge2025-01-01&status=booked"
+```
+
+---
+
+## Encounter
+
+A surgical encounter is derived from an appointment when it has at least one procedure. The Encounter ID matches the Appointment ID.
+
+**Supported interactions:** read, search
+
+### Key Fields
+
+| FHIR Field | Description |
+|---|---|
+| `id` | Encounter ID (same as appointment ID) |
+| `status` | `planned`, `in-progress`, `finished`, `cancelled` |
+| `class` | Fixed: `AMB` (ambulatory) |
+| `subject` | Patient reference |
+| `period` | Start/end times from the procedure |
+| `appointment[0]` | Appointment reference |
+| `serviceProvider` | Organisation reference |
+
+### Search Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `_id` | token | Encounter ID |
+| `patient` | reference | Patient ID |
+| `status` | token | `planned`, `in-progress`, `finished`, `cancelled` |
+
+---
+
+## Procedure
+
+Surgical procedures with full clinical detail including SNOMED CT coding and Tesa-specific [extensions](/fhir/extensions).
+
+**Supported interactions:** read, search, update
+
+### Key Fields
+
+| FHIR Field | Description |
+|---|---|
+| `id` | Procedure ID |
+| `status` | `preparation`, `in-progress`, `completed` |
+| `code` | SNOMED CT coded ligament + procedure type |
+| `subject` | Patient reference |
+| `encounter` | Encounter reference |
+| `performedPeriod` | Procedure start and end times |
+| `extension[]` | [Tesa-specific surgical extensions](/fhir/extensions) |
+
+### Search Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `_id` | token | Procedure ID |
+| `patient` | reference | Patient ID |
+| `encounter` | reference | Encounter/appointment ID |
+| `status` | token | `preparation`, `in-progress`, `completed` |
+
+### Example: Procedures for a Patient
+
+```bash
+curl -H "x-api-key: $KEY" -H "x-api-secret: $SECRET" \
+  "https://{base}/fhir/r4/Procedure?patient=Patient/42&_include=Procedure:encounter"
+```
+
+---
+
+## Observation
+
+Patient observations, clinical test results, and imaging records. One patient observation record produces **multiple** FHIR Observation resources — one per data point.
+
+**Supported interactions:** read, search
+
+### Observation Types
+
+| Category | Examples | Coding System |
+|---|---|---|
+| Vital signs | Height, weight | LOINC |
+| Clinical tests | Lachman, pivot shift, anterior drawer | SNOMED CT |
+| Imaging | X-ray, MRI, CT, ultrasound | SNOMED CT |
+| Outcome scores | SANE score | Tesa custom |
+
+### ID Scheme
+
+Observations use a composite ID: `{recordId}-{field}`. For example, record `42` produces `42-height`, `42-weight`, `42-test_lachmans`, etc.
+
+### Search Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `_id` | token | Composite observation ID |
+| `patient` | reference | Patient ID |
+| `encounter` | reference | Encounter/appointment ID |
+
+---
+
+## DiagnosticReport
+
+Post-operative report summaries linked to appointments.
+
+**Supported interactions:** read, search
+
+### Key Fields
+
+| FHIR Field | Description |
+|---|---|
+| `id` | Report ID |
+| `status` | `final`, `preliminary`, `registered` |
+| `code` | LOINC 28570-0 (Procedure note) |
+| `subject` | Patient reference |
+| `encounter` | Encounter reference |
+| `presentedForm[0].url` | Report file URL |
+
+---
+
+## DocumentReference
+
+PDF documents for post-operative reports.
+
+**Supported interactions:** read, search
+
+Document IDs are prefixed with `doc-` (e.g., `doc-123`) to distinguish them from DiagnosticReport IDs.
+
+---
+
+## Device
+
+Surgical kits and graft tensioner devices used during procedures.
+
+**Supported interactions:** read, search
+
+Device IDs are prefixed to indicate source:
+
+| Prefix | Type | Fields |
+|---|---|---|
+| `kit-` | Surgical Kit | name, manufacturer, serial number, lot number |
+| `tensioner-` | Graft Tensioner | serial number, gauge reading, angle reading |
+
+---
+
+## QuestionnaireResponse
+
+Patient-reported outcome survey submissions. IDs are prefixed with `survey-` (e.g., `survey-456`).
+
+**Supported interactions:** read, search
+
+### Key Fields
+
+| FHIR Field | Description |
+|---|---|
+| `id` | `survey-{submissionId}` |
+| `status` | `completed` |
+| `authored` | Submission date |
+| `subject` | Patient reference |
+| `encounter` | Encounter reference |
+| `item[]` | Question text and answers |
